@@ -49,6 +49,8 @@ function normalizePort(val) {
   return false;
 }
 
+//console.log('Node.js web server at ' +server.addr + ':' + server.port +' is running..')
+
 /**
  * Event listener for HTTP server "error" event.
  */
