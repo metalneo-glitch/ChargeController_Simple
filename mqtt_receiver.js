@@ -1,7 +1,7 @@
 var mqtt = require('mqtt');
-var Topic = '+/tasmotaRicaricaNissan/+'; //subscribe to all topics
+var Topic = 'tele/tasmotaRicaricaNissan/+';
 var Broker_URL = 'mqtt://192.168.0.70';
-// Acquisizione mqtt
+
 var options = {
 	clientId: 'MyMQTT',
 	port: 1883,
@@ -10,17 +10,17 @@ var options = {
     password : "sunnyBroker"
 };
 
-var client  = mqtt.connect(Broker_URL, options);
-client.on('connect', mqtt_connect);
-client.on('reconnect', mqtt_reconnect);
-client.on('error', mqtt_error);
-client.on('message', mqtt_messsageReceived);
-client.on('close', mqtt_close);
+var mqttClient  = mqtt.connect(Broker_URL, options);
+mqttClient.on('connect', mqtt_connect);
+mqttClient.on('reconnect', mqtt_reconnect);
+mqttClient.on('error', mqtt_error);
+mqttClient.on('message', mqtt_messsageReceived);
+mqttClient.on('close', mqtt_close);
 
 function mqtt_connect()
 {
     console.log("Connecting MQTT");
-    client.subscribe(Topic, mqtt_subscribe);
+    mqttClient.subscribe(Topic, mqtt_subscribe);
 }
 
 function mqtt_subscribe(err, granted)
@@ -33,7 +33,7 @@ function mqtt_reconnect(err)
 {
     console.log("Reconnect MQTT");
     if (err) {console.log(err);}
-	client  = mqtt.connect(Broker_URL, options);
+	mqttClient  = mqtt.connect(Broker_URL, options);
 }
 
 function mqtt_error(err)
@@ -50,10 +50,17 @@ function after_publish()
 function mqtt_messsageReceived(topic, message, packet)
 {
 	//console.log('Topic=' +  topic + '  Message=' + message);
-    console.log("message received");
+    if (message != "Online"){
+        var msg = JSON.parse(message);
+        console.log(msg);
+        if ('ENERGY' in msg){
+            console.log("Energia totale:" + msg.ENERGY.Total + "kWh");
+        }
+    }
 }
 
 function mqtt_close()
 {
 	console.log("Close MQTT");
 }
+module.exports = mqttClient;
